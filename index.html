@@ -244,12 +244,13 @@
             <p id="login-error" class="text-red-500 text-sm mt-2"></p>
         </div>
 
+        <!-- MODIFICATO: Rimosso il tag <form> e cambiato il pulsante -->
         <div class="admin-controls">
             <h2 class="text-lg text-cyan-400 mb-2">Aggiungi Giocatore</h2>
-            <form id="add-player-form" class="flex flex-wrap justify-center items-center">
-                <input type="text" id="username-input" placeholder="@username" class="arcade-input" required>
-                <button type="submit" class="arcade-button">Aggiungi</button>
-            </form>
+            <div class="flex flex-wrap justify-center items-center">
+                <input type="text" id="username-input" placeholder="@username" class="arcade-input">
+                <button type="button" id="add-player-btn" class="arcade-button">Aggiungi</button>
+            </div>
         </div>
     </div>
 
@@ -272,12 +273,13 @@
 
         const leaderboardList = document.getElementById('leaderboard-list');
         const loadingMessage = document.getElementById('loading-message');
-        const addPlayerForm = document.getElementById('add-player-form');
         const usernameInput = document.getElementById('username-input');
         const adminLoginPanel = document.getElementById('admin-login-panel');
         const adminPasswordInput = document.getElementById('admin-password');
         const loginBtn = document.getElementById('login-btn');
         const loginError = document.getElementById('login-error');
+        // MODIFICATO: Riferimento al nuovo pulsante
+        const addPlayerBtn = document.getElementById('add-player-btn');
 
         function enableAdminMode() {
             document.body.classList.add('admin-mode');
@@ -377,18 +379,30 @@
             }
         });
 
-        addPlayerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // MODIFICATO: Nuova funzione e listener per aggiungere un giocatore
+        const handleAddPlayer = async () => {
             const username = usernameInput.value.trim();
             if (username) {
                 try {
-                    await addDoc(leaderboardCollectionRef, { username: username, score: 0, cycles: 0 });
+                    await addDoc(leaderboardCollectionRef, { 
+                        username: username, 
+                        score: 0,
+                        cycles: 0
+                    });
                     usernameInput.value = '';
                 } catch (error) {
                     console.error("Errore nell'aggiungere il giocatore: ", error);
                 }
             }
+        };
+
+        addPlayerBtn.addEventListener('click', handleAddPlayer);
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleAddPlayer();
+            }
         });
+
 
         function attachSnapshotListener() {
             onSnapshot(leaderboardCollectionRef, (snapshot) => {
