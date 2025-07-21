@@ -1,441 +1,425 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="it">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard Arcade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Stile generale con font arcade */
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #0d0d0d;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                linear-gradient(rgba(0, 255, 153, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 153, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Contenitore principale della leaderboard */
+        .leaderboard-container {
+            background-color: #000000;
+            border: 4px solid #00ff99;
+            box-shadow: 0 0 20px #00ff99, inset 0 0 20px #00ff99;
+            padding: 2rem;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .game-title {
+            color: #00ff99;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 2px #000;
+        }
+
+        .title {
+            color: #ffff00;
+            text-shadow: 4px 4px 0px #ff00ff, -4px -4px 0px #00ffff;
+            font-size: 2.5rem;
+            margin-bottom: 0;
+        }
+        
+        .subtitle {
+            color: #cccccc;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow:
+                    4px 4px 0px #ff00ff,
+                    -4px -4px 0px #00ffff;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+
+        #leaderboard-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        #leaderboard-list li {
+            display: flex;
+            align-items: center;
+            padding: 10px 5px;
+            border-bottom: 2px dashed rgba(0, 255, 153, 0.3);
+            gap: 15px;
+        }
+
+        #leaderboard-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .rank-container {
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .rank { 
+            color: #ff00ff; 
+            font-size: 1.1rem;
+        }
+        .name { 
+            color: #ffffff; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap;
+            flex-grow: 1;
+            font-size: 1.1rem;
+        }
+        .score { 
+            color: #ffff00; 
+            text-align: right;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .badge-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .discount-badge {
+            color: #000000;
+            background-color: #ffff00;
+            font-size: 0.6rem;
+            padding: 4px 8px;
+            border-radius: 5px;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .discount-multiplier {
+            position: absolute;
+            top: -12px;
+            right: -5px;
+            color: #ff00ff;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 2px #000;
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px #ffff00; }
+            50% { transform: scale(1.1); box-shadow: 0 0 15px #ffff00; }
+            100% { transform: scale(1); box-shadow: 0 0 5px #ffff00; }
+        }
+
+        .prestige-star {
+            fill: #ffff00;
+            width: 1em;
+            height: 1em;
+            margin-right: 8px;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .admin-controls {
+            display: none;
+            background-color: rgba(0, 255, 153, 0.1);
+            border: 2px solid #00ff99;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        body.admin-mode .admin-controls {
+            display: block;
+        }
+        
+        .add-point-btn {
+            display: none;
+            background-color: #ffff00;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            border-radius: 5px;
+            transition: transform 0.1s;
+            flex-shrink: 0;
+        }
+        .add-point-btn:active {
+            transform: scale(0.9);
+        }
+
+        body.admin-mode .add-point-btn {
+            display: inline-block;
+        }
+
+        .arcade-input, .arcade-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #1a1a1a;
+            border: 2px solid #00ff99;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px;
+            outline: none;
+        }
+        .arcade-input::placeholder {
+            color: #888;
+        }
+        .arcade-button {
+            cursor: pointer;
+            background-color: #ff00ff;
+            color: #000;
+        }
+        .arcade-button:hover {
+            background-color: #ffff00;
+        }
+        
+        #loading-message {
+            color: #00ff99;
+        }
+
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="it"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Leaderboard Arcade&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Stile generale con font arcade */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Press Start 2P', cursive;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #0d0d0d;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-image:<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>linear-gradient(rgba(0, 255, 153, 0.1) 1px, transparent 1px),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linear-gradient(90deg, rgba(0, 255, 153, 0.1) 1px, transparent 1px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-size: 20px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Contenitore principale della leaderboard */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.leaderboard-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #000000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 4px solid #00ff99;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 20px #00ff99, inset 0 0 20px #00ff99;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 800px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.game-title {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #00ff99;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 2px 2px 2px #000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.title {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffff00;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 4px 4px 0px #ff00ff, -4px -4px 0px #00ffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 2.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.subtitle {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #cccccc;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 0.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>letter-spacing: 2px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes flicker {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0%, 18%, 22%, 25%, 53%, 57%, 100% {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>text-shadow:</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>4px 4px 0px #ff00ff,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>-4px -4px 0px #00ffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>20%, 24%, 55% {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>text-shadow: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>#leaderboard-list {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>list-style: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>#leaderboard-list li {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 2px dashed rgba(0, 255, 153, 0.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>#leaderboard-list li:last-child {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.rank-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 80px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-shrink: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.rank {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff00ff;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.name {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffffff;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-overflow: ellipsis;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>white-space: nowrap;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-grow: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.score {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffff00;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: right;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: flex-end;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.badge-wrapper {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.discount-badge {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #000000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ffff00;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.6rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 4px 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: pulse 1.5s infinite;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.discount-multiplier {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: -12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>right: -5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ff00ff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.2rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-shadow: 2px 2px 2px #000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: rotate(15deg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes pulse {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0% { transform: scale(1); box-shadow: 0 0 5px #ffff00; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>50% { transform: scale(1.1); box-shadow: 0 0 15px #ffff00; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>100% { transform: scale(1); box-shadow: 0 0 5px #ffff00; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.prestige-star {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>fill: #ffff00;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 1em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 1em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-right: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: spin 4s linear infinite;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>from { transform: rotate(0deg); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>to { transform: rotate(360deg); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.admin-controls {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: rgba(0, 255, 153, 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #00ff99;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 1.5rem;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 2rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body.admin-mode .admin-controls {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.add-point-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ffff00;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 5px 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Press Start 2P', cursive;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.1s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-shrink: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.add-point-btn:active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scale(0.9);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body.admin-mode .add-point-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.arcade-input, .arcade-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Press Start 2P', cursive;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #00ff99;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.arcade-input::placeholder {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #888;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.arcade-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ff00ff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #000;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.arcade-button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #ffff00;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>#loading-message {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #00ff99;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="leaderboard-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 class="game-title"&gt;#NOTJOE&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1 class="title"&gt;HIGH SCORES&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="subtitle"&gt;a Banana Joe Minigame&lt;/p&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="loading-message"&gt;CARICAMENTO...&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;ol id="leaderboard-list"&gt;&lt;/ol&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="admin-login-panel" class="mt-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-lg text-cyan-400 mb-2"&gt;Modalita' Admin&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="password" id="admin-password" placeholder="Password" class="arcade-input"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="login-btn" class="arcade-button"&gt;Sblocca&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p id="login-error" class="text-red-500 text-sm mt-2"&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="admin-controls"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-lg text-cyan-400 mb-2"&gt;Aggiungi Giocatore&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;form id="add-player-form" class="flex flex-wrap justify-center items-center"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="text" id="username-input" placeholder="@username" class="arcade-input" required&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button type="submit" class="arcade-button"&gt;Aggiungi&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/form&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="module"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const firebaseConfig = typeof __firebase_config !== 'undefined'<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>? JSON.parse(__firebase_config)</p>
-<p class="p1"><span class="Apple-converted-space">            </span>: { apiKey: "YOUR_API_KEY", authDomain: "...", projectId: "..." };</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-leaderboard';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ADMIN_PASSWORD = "admin123";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const app = initializeApp(firebaseConfig);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const db = getFirestore(app);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const auth = getAuth(app);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const leaderboardCollectionRef = collection(db, `artifacts/${appId}/public/data/leaderboard`);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const leaderboardList = document.getElementById('leaderboard-list');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const loadingMessage = document.getElementById('loading-message');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const addPlayerForm = document.getElementById('add-player-form');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const usernameInput = document.getElementById('username-input');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const adminLoginPanel = document.getElementById('admin-login-panel');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const adminPasswordInput = document.getElementById('admin-password');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const loginBtn = document.getElementById('login-btn');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const loginError = document.getElementById('login-error');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function enableAdminMode() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.body.classList.add('admin-mode');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>adminLoginPanel.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>sessionStorage.setItem('isAdmin', 'true');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderLeaderboard();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function checkAdminLogin() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (adminPasswordInput.value === ADMIN_PASSWORD) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>enableAdminMode();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loginError.textContent = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loginError.textContent = 'Password errata!';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (sessionStorage.getItem('isAdmin') === 'true') {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>enableAdminMode();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>loginBtn.addEventListener('click', checkAdminLogin);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>adminPasswordInput.addEventListener('keypress', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (e.key === 'Enter') checkAdminLogin();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let players = [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const renderLeaderboard = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const sortedPlayers = [...players].sort((a, b) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if ((b.cycles || 0) !== (a.cycles || 0)) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>return (b.cycles || 0) - (a.cycles || 0);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return (b.score || 0) - (a.score || 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>leaderboardList.innerHTML = '';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (sortedPlayers.length === 0 &amp;&amp; loadingMessage.textContent !== "Errore di connessione. Permessi insufficienti?") {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loadingMessage.textContent = 'Nessun giocatore. Aggiungine uno!';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loadingMessage.style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (sortedPlayers.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                 </span>loadingMessage.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>sortedPlayers.forEach((player, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const li = document.createElement('li');</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>let rankSuffix;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (index + 1 === 1) rankSuffix = 'ST';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>else if (index + 1 === 2) rankSuffix = 'ND';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>else if (index + 1 === 3) rankSuffix = 'RD';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>else rankSuffix = 'TH';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>let discountBadgeHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (player.cycles &amp;&amp; player.cycles &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const multiplierHTML = `&lt;span class="discount-multiplier"&gt;x${player.cycles}&lt;/span&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>discountBadgeHTML = `&lt;div class="badge-wrapper"&gt;&lt;span class="discount-badge"&gt;10% OFF&lt;/span&gt;${multiplierHTML}&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>let prestigeStarHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (player.cycles &amp;&amp; player.cycles &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>prestigeStarHTML = `&lt;svg class="prestige-star" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"&gt;&lt;path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/&gt;&lt;/svg&gt;`.repeat(player.cycles);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>li.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="rank-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="rank"&gt;${index + 1}${rankSuffix}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${discountBadgeHTML}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span class="name"&gt;${player.username}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span class="score"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${prestigeStarHTML}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span&gt;${player.score.toString().padStart(2, '0')}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button class="add-point-btn" data-id="${player.id}"&gt;+1&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>leaderboardList.appendChild(li);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>leaderboardList.addEventListener('click', async (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const addPointBtn = e.target.closest('.add-point-btn');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (addPointBtn) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const playerId = addPointBtn.dataset.id;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const playerRef = doc(db, `artifacts/${appId}/public/data/leaderboard`, playerId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const currentPlayer = players.find(p =&gt; p.id === playerId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!currentPlayer) return;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (currentPlayer.score &gt;= 10) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>await updateDoc(playerRef, { score: 0, cycles: increment(1) });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>await updateDoc(playerRef, { score: increment(1) });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Errore nell'aggiornare il punteggio: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>addPlayerForm.addEventListener('submit', async (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>e.preventDefault();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const username = usernameInput.value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (username) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await addDoc(leaderboardCollectionRef, { username: username, score: 0, cycles: 0 });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>usernameInput.value = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Errore nell'aggiungere il giocatore: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function attachSnapshotListener() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>onSnapshot(leaderboardCollectionRef, (snapshot) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>players = snapshot.docs.map(doc =&gt; ({ id: doc.id, ...doc.data() }));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderLeaderboard();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}, (error) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error("Errore nel ricevere i dati: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loadingMessage.textContent = "Errore di connessione.";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function authenticateAndLoadData() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>onAuthStateChanged(auth, (user) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (user) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>attachSnapshotListener();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (typeof __initial_auth_token !== 'undefined' &amp;&amp; __initial_auth_token) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await signInWithCustomToken(auth, __initial_auth_token);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await signInAnonymously(auth);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error("Errore di autenticazione:", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loadingMessage.textContent = "Errore di autenticazione.";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>authenticateAndLoadData();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+    <div class="leaderboard-container">
+        <h2 class="game-title">#NOTJOE</h2>
+        <h1 class="title">HIGH SCORES</h1>
+        <p class="subtitle">a Banana Joe Minigame</p>
+        
+        <div id="loading-message">CARICAMENTO...</div>
+        
+        <ol id="leaderboard-list"></ol>
+
+        <div id="admin-login-panel" class="mt-8">
+            <h2 class="text-lg text-cyan-400 mb-2">Modalita' Admin</h2>
+            <input type="password" id="admin-password" placeholder="Password" class="arcade-input">
+            <button id="login-btn" class="arcade-button">Sblocca</button>
+            <p id="login-error" class="text-red-500 text-sm mt-2"></p>
+        </div>
+
+        <div class="admin-controls">
+            <h2 class="text-lg text-cyan-400 mb-2">Aggiungi Giocatore</h2>
+            <form id="add-player-form" class="flex flex-wrap justify-center items-center">
+                <input type="text" id="username-input" placeholder="@username" class="arcade-input" required>
+                <button type="submit" class="arcade-button">Aggiungi</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config)
+            : { apiKey: "YOUR_API_KEY", authDomain: "...", projectId: "..." };
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-leaderboard';
+        const ADMIN_PASSWORD = "admin123";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const leaderboardCollectionRef = collection(db, `artifacts/${appId}/public/data/leaderboard`);
+
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const loadingMessage = document.getElementById('loading-message');
+        const addPlayerForm = document.getElementById('add-player-form');
+        const usernameInput = document.getElementById('username-input');
+        const adminLoginPanel = document.getElementById('admin-login-panel');
+        const adminPasswordInput = document.getElementById('admin-password');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
+
+        function enableAdminMode() {
+            document.body.classList.add('admin-mode');
+            adminLoginPanel.style.display = 'none';
+            sessionStorage.setItem('isAdmin', 'true');
+            renderLeaderboard();
+        }
+
+        function checkAdminLogin() {
+            if (adminPasswordInput.value === ADMIN_PASSWORD) {
+                enableAdminMode();
+                loginError.textContent = '';
+            } else {
+                loginError.textContent = 'Password errata!';
+            }
+        }
+        
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+            enableAdminMode();
+        }
+
+        loginBtn.addEventListener('click', checkAdminLogin);
+        adminPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAdminLogin();
+        });
+
+        let players = [];
+
+        const renderLeaderboard = () => {
+            const sortedPlayers = [...players].sort((a, b) => {
+                if ((b.cycles || 0) !== (a.cycles || 0)) {
+                    return (b.cycles || 0) - (a.cycles || 0);
+                }
+                return (b.score || 0) - (a.score || 0);
+            });
+            leaderboardList.innerHTML = '';
+
+            if (sortedPlayers.length === 0 && loadingMessage.textContent !== "Errore di connessione. Permessi insufficienti?") {
+                loadingMessage.textContent = 'Nessun giocatore. Aggiungine uno!';
+                loadingMessage.style.display = 'block';
+            } else if (sortedPlayers.length > 0) {
+                 loadingMessage.style.display = 'none';
+            }
+
+            sortedPlayers.forEach((player, index) => {
+                const li = document.createElement('li');
+                
+                let rankSuffix;
+                if (index + 1 === 1) rankSuffix = 'ST';
+                else if (index + 1 === 2) rankSuffix = 'ND';
+                else if (index + 1 === 3) rankSuffix = 'RD';
+                else rankSuffix = 'TH';
+
+                let discountBadgeHTML = '';
+                if (player.cycles && player.cycles > 0) {
+                    const multiplierHTML = `<span class="discount-multiplier">x${player.cycles}</span>`;
+                    discountBadgeHTML = `<div class="badge-wrapper"><span class="discount-badge">10% OFF</span>${multiplierHTML}</div>`;
+                }
+
+                let prestigeStarHTML = '';
+                if (player.cycles && player.cycles > 0) {
+                    prestigeStarHTML = `<svg class="prestige-star" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`.repeat(player.cycles);
+                }
+
+                li.innerHTML = `
+                    <div class="rank-container">
+                        <span class="rank">${index + 1}${rankSuffix}</span>
+                        ${discountBadgeHTML}
+                    </div>
+                    <span class="name">${player.username}</span>
+                    <span class="score">
+                        ${prestigeStarHTML}
+                        <span>${player.score.toString().padStart(2, '0')}</span>
+                    </span>
+                    <button class="add-point-btn" data-id="${player.id}">+1</button>
+                `;
+                leaderboardList.appendChild(li);
+            });
+        };
+
+        leaderboardList.addEventListener('click', async (e) => {
+            const addPointBtn = e.target.closest('.add-point-btn');
+            if (addPointBtn) {
+                const playerId = addPointBtn.dataset.id;
+                const playerRef = doc(db, `artifacts/${appId}/public/data/leaderboard`, playerId);
+                const currentPlayer = players.find(p => p.id === playerId);
+                if (!currentPlayer) return;
+                try {
+                    if (currentPlayer.score >= 10) {
+                        await updateDoc(playerRef, { score: 0, cycles: increment(1) });
+                    } else {
+                        await updateDoc(playerRef, { score: increment(1) });
+                    }
+                } catch (error) {
+                    console.error("Errore nell'aggiornare il punteggio: ", error);
+                }
+            }
+        });
+
+        addPlayerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            if (username) {
+                try {
+                    await addDoc(leaderboardCollectionRef, { username: username, score: 0, cycles: 0 });
+                    usernameInput.value = '';
+                } catch (error) {
+                    console.error("Errore nell'aggiungere il giocatore: ", error);
+                }
+            }
+        });
+
+        function attachSnapshotListener() {
+            onSnapshot(leaderboardCollectionRef, (snapshot) => {
+                players = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderLeaderboard();
+            }, (error) => {
+                console.error("Errore nel ricevere i dati: ", error);
+                loadingMessage.textContent = "Errore di connessione.";
+            });
+        }
+
+        async function authenticateAndLoadData() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    attachSnapshotListener();
+                }
+            });
+            
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Errore di autenticazione:", error);
+                loadingMessage.textContent = "Errore di autenticazione.";
+            }
+        }
+
+        authenticateAndLoadData();
+    </script>
 </body>
 </html>
