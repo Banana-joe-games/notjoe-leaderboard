@@ -262,11 +262,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // MODIFICATO: Inserite le tue chiavi Firebase personali
+        // MODIFICATO: Inserita la tua chiave API
         const firebaseConfig = {
-          apiKey: "AIzaSyD1JmOn-fIcapxKD389wDRRi4dFLJUEL0E",
+          apiKey: "AIzaSyBRF1zV1wh-IWKLBFmulk1zWBkAYI8vcXE",
           authDomain: "notjoe-leaderboard.firebaseapp.com",
           projectId: "notjoe-leaderboard",
           storageBucket: "notjoe-leaderboard.firebasestorage.app",
@@ -275,7 +275,6 @@
           measurementId: "G-8S1QM0W9RX"
         };
         
-        // Questa variabile ora userà il tuo projectId per coerenza
         const appId = firebaseConfig.projectId;
         const ADMIN_PASSWORD = "admin123";
 
@@ -444,7 +443,6 @@
             });
             
             try {
-                // Su un sito pubblico, useremo sempre l'accesso anonimo
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Errore di autenticazione:", error);
