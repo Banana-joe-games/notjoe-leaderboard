@@ -220,7 +220,6 @@
         .arcade-button:hover:not(:disabled) {
             background-color: #ffff00;
         }
-        /* NUOVO: Stile per il pulsante disabilitato */
         .arcade-button:disabled {
             background-color: #4a1a4a;
             color: #888;
@@ -247,7 +246,6 @@
         <div id="admin-login-panel" class="mt-8">
             <h2 class="text-lg text-cyan-400 mb-2">Modalita' Admin</h2>
             <input type="password" id="admin-password" placeholder="Password" class="arcade-input">
-            <!-- MODIFICATO: Pulsante disabilitato all'inizio -->
             <button id="login-btn" class="arcade-button" disabled>Connessione...</button>
             <p id="login-error" class="text-red-500 text-sm mt-2"></p>
         </div>
@@ -266,11 +264,19 @@
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config)
-            : { apiKey: "YOUR_API_KEY", authDomain: "...", projectId: "..." };
+        // MODIFICATO: Inserite le tue chiavi Firebase personali
+        const firebaseConfig = {
+          apiKey: "AIzaSyD1JmOn-fIcapxKD389wDRRi4dFLJUEL0E",
+          authDomain: "notjoe-leaderboard.firebaseapp.com",
+          projectId: "notjoe-leaderboard",
+          storageBucket: "notjoe-leaderboard.firebasestorage.app",
+          messagingSenderId: "820416712944",
+          appId: "1:820416712944:web:db31c2fb09e51b66663235",
+          measurementId: "G-8S1QM0W9RX"
+        };
         
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-leaderboard';
+        // Questa variabile ora userà il tuo projectId per coerenza
+        const appId = firebaseConfig.projectId;
         const ADMIN_PASSWORD = "admin123";
 
         const app = initializeApp(firebaseConfig);
@@ -310,7 +316,6 @@
         loginBtn.addEventListener('click', checkAdminLogin);
         adminPasswordInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                // Impedisce di fare il login se il pulsante è disabilitato
                 if (!loginBtn.disabled) {
                     checkAdminLogin();
                 }
@@ -424,17 +429,14 @@
         }
 
         async function authenticateAndLoadData() {
-            // MODIFICATO: Logica di autenticazione più robusta
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    // Utente autenticato, abilita l'interfaccia
                     console.log("Autenticazione completata. UI pronta.");
                     loadingMessage.textContent = "CARICAMENTO...";
                     loginBtn.disabled = false;
                     loginBtn.textContent = "Sblocca";
                     attachSnapshotListener();
                 } else {
-                    // Utente non autenticato, mantiene l'interfaccia bloccata
                     console.log("In attesa di autenticazione...");
                     loginBtn.disabled = true;
                     loginBtn.textContent = "Connessione...";
@@ -442,11 +444,8 @@
             });
             
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // Su un sito pubblico, useremo sempre l'accesso anonimo
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error("Errore di autenticazione:", error);
                 loadingMessage.textContent = "Errore di autenticazione.";
