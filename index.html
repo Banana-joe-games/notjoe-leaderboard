@@ -215,9 +215,16 @@
             cursor: pointer;
             background-color: #ff00ff;
             color: #000;
+            transition: background-color 0.2s;
         }
-        .arcade-button:hover {
+        .arcade-button:hover:not(:disabled) {
             background-color: #ffff00;
+        }
+        /* NUOVO: Stile per il pulsante disabilitato */
+        .arcade-button:disabled {
+            background-color: #4a1a4a;
+            color: #888;
+            cursor: not-allowed;
         }
         
         #loading-message {
@@ -240,11 +247,11 @@
         <div id="admin-login-panel" class="mt-8">
             <h2 class="text-lg text-cyan-400 mb-2">Modalita' Admin</h2>
             <input type="password" id="admin-password" placeholder="Password" class="arcade-input">
-            <button id="login-btn" class="arcade-button">Sblocca</button>
+            <!-- MODIFICATO: Pulsante disabilitato all'inizio -->
+            <button id="login-btn" class="arcade-button" disabled>Connessione...</button>
             <p id="login-error" class="text-red-500 text-sm mt-2"></p>
         </div>
 
-        <!-- MODIFICATO: Rimosso il tag <form> e cambiato il pulsante -->
         <div class="admin-controls">
             <h2 class="text-lg text-cyan-400 mb-2">Aggiungi Giocatore</h2>
             <div class="flex flex-wrap justify-center items-center">
@@ -278,7 +285,6 @@
         const adminPasswordInput = document.getElementById('admin-password');
         const loginBtn = document.getElementById('login-btn');
         const loginError = document.getElementById('login-error');
-        // MODIFICATO: Riferimento al nuovo pulsante
         const addPlayerBtn = document.getElementById('add-player-btn');
 
         function enableAdminMode() {
@@ -303,7 +309,12 @@
 
         loginBtn.addEventListener('click', checkAdminLogin);
         adminPasswordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkAdminLogin();
+            if (e.key === 'Enter') {
+                // Impedisce di fare il login se il pulsante è disabilitato
+                if (!loginBtn.disabled) {
+                    checkAdminLogin();
+                }
+            }
         });
 
         let players = [];
@@ -317,7 +328,7 @@
             });
             leaderboardList.innerHTML = '';
 
-            if (sortedPlayers.length === 0 && loadingMessage.textContent !== "Errore di connessione. Permessi insufficienti?") {
+            if (sortedPlayers.length === 0 && loadingMessage.textContent !== "Errore di connessione.") {
                 loadingMessage.textContent = 'Nessun giocatore. Aggiungine uno!';
                 loadingMessage.style.display = 'block';
             } else if (sortedPlayers.length > 0) {
@@ -379,7 +390,6 @@
             }
         });
 
-        // MODIFICATO: Nuova funzione e listener per aggiungere un giocatore
         const handleAddPlayer = async () => {
             const username = usernameInput.value.trim();
             if (username) {
@@ -403,7 +413,6 @@
             }
         });
 
-
         function attachSnapshotListener() {
             onSnapshot(leaderboardCollectionRef, (snapshot) => {
                 players = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -415,9 +424,20 @@
         }
 
         async function authenticateAndLoadData() {
+            // MODIFICATO: Logica di autenticazione più robusta
             onAuthStateChanged(auth, (user) => {
                 if (user) {
+                    // Utente autenticato, abilita l'interfaccia
+                    console.log("Autenticazione completata. UI pronta.");
+                    loadingMessage.textContent = "CARICAMENTO...";
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = "Sblocca";
                     attachSnapshotListener();
+                } else {
+                    // Utente non autenticato, mantiene l'interfaccia bloccata
+                    console.log("In attesa di autenticazione...");
+                    loginBtn.disabled = true;
+                    loginBtn.textContent = "Connessione...";
                 }
             });
             
@@ -430,6 +450,7 @@
             } catch (error) {
                 console.error("Errore di autenticazione:", error);
                 loadingMessage.textContent = "Errore di autenticazione.";
+                loginBtn.textContent = "Errore";
             }
         }
 
